@@ -1,2 +1,2 @@
-# mixture_survival
-R codes related to and instructions to reproduce results in manuscript titled "A Mixture Survival Model and Harm Measures for Studying Misdiagnosis-Related Harm with Electronic Health Records"
+# synthetic_data
+This folder contains a synthetic dataset created for runnning data analyses on. Code used for synthetic data creation is also provided.
