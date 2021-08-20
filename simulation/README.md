@@ -1,2 +1,4 @@
-# mixture_survival
-R codes related to and instructions to reproduce results in manuscript titled "A Mixture Survival Model and Harm Measures for Studying Misdiagnosis-Related Harm with Electronic Health Records"
+# Simulation studies
+R codes used for simulation studies. All numbers and figures presented in the simulation studies can be reproduced using codes in this folder.
+
+
