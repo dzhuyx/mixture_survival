@@ -2,9 +2,14 @@
 # data is generated using summary statistics and estimated coefficients
 
 rm(list = ls())
+# setwd to root
+setwd("/Users/daisyzhu/Documents/Research Projects/SPADE/manuscript/code_submission/mixture_survival")
+# setwd
+setwd("synthetic_data/")
 # read specification
 load("Taiwan_X_spec.rda")
-load("Taiwan_par_spec.rda")
+load("MLE_result.rda")
+fit0 <- fit
 
 # set seed
 seed <- 47 # change this seed to generate a different synthetic dataset
@@ -58,4 +63,8 @@ Y <- sapply(1:n, function(i) {
 
 data$EventDays <- Y
 data$stroke <- 1 # placeholder
+data$ID <- 1:nrow(data)
+# add age_middle variable
+data$age_middle <- as.numeric(data$age_young == 0 & data$age_old == 0)
+
 save(list = "data", file = "synthetic_Taiwan.rda")

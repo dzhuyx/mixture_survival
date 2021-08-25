@@ -1,14 +1,17 @@
-# figures related to 05/19/2021 results
+# figures for data analysis
 
 # figure for harm risk factors
 rm(list = ls())
+library(ggplot2)
+library(scales)
+library(patchwork)
 
 my2cols <- c("#E7B800", "#2E9FDF")
 my3cols <- c(my2cols, "#FC4E07")
 my4cols <- c(my3cols, "#66cd00")
 my5cols <- c(my4cols, "#AC92EB")
 my6cols <- c(my5cols, "#AFC1CC")
-load("taiwan_parmix_05192021_harmriskfactor.rda")
+load("synthetic_harmriskfactor.rda")
 # extract ah data
 harm_ah_riskfactor <- list(age = harm_ah_age, 
                            gender = harm_ah_gender,
@@ -169,8 +172,7 @@ q1_rah <- ggplot(data = dat_plot,
       xlab("") + ylab("Relative attributable harm")
 
 ((((q1_ah) / (q1_rah)) & theme(legend.position = "bottom")) + 
-            plot_layout(guides = "collect")) # (2 * 800) * 500
-# 1200 * 900
+            plot_layout(guides = "collect")) # 1600 * 500
 
 # figures for time-dynamic harm in different age groups
 dat_plot <- rbind(data.frame(time = rep(harm_curve_ah_age$t, 3),
@@ -221,7 +223,7 @@ my3cols <- c(my2cols, "#FC4E07")
 my4cols <- c(my3cols, "#66cd00")
 my5cols <- c(my4cols, "#AC92EB")
 my6cols <- c(my5cols, "#AFC1CC")
-load("taiwan_parmix_05192021_pivotaltime.rda")
+load("synthetic_landmarktime.rda")
 tau_list_ah <- list(age = fit_ah_age,
                     gender = fit_ah_gender,
                     HT = fit_ah_HT,
@@ -555,8 +557,5 @@ result_est <- t(apply(coef_est, 1, function(x) {
 }))
 result_est <- data.frame(result_est)
 write.csv(cbind(coef_est[, 1], result_est), 
-          file = "taiwan_parmix_05192021_est.csv")
-
-
-
+          file = "taiwan_parmix_est.csv")
 

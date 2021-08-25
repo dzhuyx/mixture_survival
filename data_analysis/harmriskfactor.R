@@ -1,8 +1,10 @@
 rm(list = ls())
 library(rootSolve)
-load("Before PSM-for Zheyu.RData")
+
+# real data, LHID-2010
+# load("Before PSM-for Zheyu.RData")
+load("synthetic_Taiwan.rda") # load synthetic data
 source("parmix_function_poly.R")
-# load("varlist_revised.rda") 
 # load variable list 
 varlist_long <- c("gs2", "gender", "HT", "DM", "AF", "before_STROKE", "dd",                  
                   "SocioeconomicStatus2", "SocioeconomicStatus1", 
@@ -14,110 +16,46 @@ varlist_short <- c("gs2", "gender", "HT", "DM", "before_STROKE",
 
 varlist_shortint <- c("gs2_age_old")
 
-# k <- 3
-# k <- as.numeric(Sys.getenv("SGE_TASK_ID"))
-
 t0 <- 1
-VARS19 <- c("age", "gender", "SocioeconomicStatus", "UrbanStatus", 
-            "area", "HT", "DM", "HYPERLIPIDEMIA", "MI", "HF",
-            "AF", "CARDIAC_DYSRHYTHMIA", "before_STROKE", 
-            "COPD", "CANCER", "CKD", "cardiologist_care", 
-            "dd", "Teaching")
-# data$EventDays <- data$EventDays + rnorm(nrow(data), 0, 0.2)
+tupper <- 365
+VARS19 <- unique(c(varlist_long, varlist_short, varlist_shortint, "age_middle"))
+
 data$EventDays1 <- data$EventDays
 data$stroke1 <- 1
 data$stroke1[data$EventDays > 365] <- 0
 data$EventDays1[data$EventDays > 365] <- 365
-# data$age <- log(data$age)
-# data$age <- scale(data$age)
 
 data$EventDays <- data$EventDays1
 data$stroke <- data$stroke1
-data <- data[, c("ID", "GeneralistSpecialist", "stroke", "EventDays", VARS19)]
+data <- data[, c("ID", "stroke", "EventDays", VARS19)]
 
-# plot(survfit(Surv(EventDays, stroke) ~ GeneralistSpecialist, data = data),
-#      xlim = c(0, 365), ylim = c(0.99, 1), lty = c(1, 2), lwd = 3,
-#      xlab = "Time (days)", ylab = "Stroke-free proportion")
-# legend(10, 0.995, c("Special care", "General care"), lty = c(1, 2), bty = "n")
+gs1 <- data$gs2 == 0
+gs2 <- data$gs2 == 1
 
-# data <- data[data$EventDays > 3, ]
-
-
-
-# # # K-M plot
-# Y <- data$EventDays
-# d <- data$stroke
-# plot(survfit(Surv(Y, d) ~ 1), ylim = c(0.99,1), xlim = c(0, 365))
-
-
-cat_to_binary <- function(IDvec, x, name) {
-      temp <- unique(x)
-      out <- data.frame(ID = IDvec)
-      colnames(out)[1] <- "ID"
-      for (j in 1:(length(temp) - 1)) {
-            out <- cbind(out, as.numeric(x == temp[j]))
-            colnames(out)[j+1] <- paste0(name, temp[j])
-      }
-      return(out)
-}
-
-var_cat <- c("SocioeconomicStatus", "UrbanStatus", "area", "Teaching")
-for (var in var_cat) {
-      data <- merge(data, cat_to_binary(data$ID, data[, var], var), by = "ID")
-      data[, var] <- NULL
-}
-
-data$age_young <- as.numeric(data$age <= 40)
-data$age_middle <- as.numeric(data$age > 40 & data$age <= 60)
-data$age_old <- as.numeric(data$age > 60)
-data$gs2 <- as.numeric(data$GeneralistSpecialist == 2)
-
-# create interaction variables
-for (var in varlist_short) {
-      temp <- as.numeric(data$GeneralistSpecialist == 2) * data[, var]
-      data <- cbind(data, temp)
-      colnames(data)[ncol(data)] <- paste0("gs2_", var)
-}
-
-
-#data$age <- scale(data$age)
-
-
-gs1 <- data$GeneralistSpecialist == 1
-gs2 <- data$GeneralistSpecialist == 2
-
-# set.seed(37)
-# data <- data[c(sample(which(gs1), 20000, replace = F),
-#                sample(which(gs2), 20000, replace = F)), ]
-gs1 <- data$GeneralistSpecialist == 1
-gs2 <- data$GeneralistSpecialist == 2
 n1 <- sum(gs1)
 n2 <- sum(gs2)
 n <- nrow(data)
 
-# without any covariates
-# p <- length(varlist)
 X0 <- cbind(1, matrix(unlist(data[, varlist_long]), nrow = n))
 X1 <- cbind(1, matrix(unlist(data[, varlist_short]), nrow = n),
             matrix(unlist(data[, varlist_shortint]), nrow = n))
-# X2 <- matrix(1, nrow = n, ncol = 1)
-X2 <- X1 # new analyses updated on 05/19/2021
-# X2 <- cbind(1, gs2) # old analyses covariate matrix
+X2 <- X1
 p0 <- ncol(X0)
 p1 <- ncol(X1)
 p2 <- ncol(X2)
 
-# colMeans of c(varlist_long, varlist_short, varlist_shortint)
-X_freq <- colMeans(data[, unique(c(varlist_long, varlist_short))])
-save(list = c("varlist_long", "varlist_short", "varlist_shortint",
-              "X_freq", "n"), file = "Taiwan_X_spec.rda")
+# choose from the Option 1 or 2, run one. Default is Option 1
 
-
-# load analysis result rda, updated in 05/2021
-load("taiwan_parmix_05192021_poly_start2189.rda") # this seed is selected according to llh
+## Option 1: 
+## load real data analysis MLE result
+load("MLE_result.rda") 
 fit0 <- fit
-save(list = "fit0", file = "Taiwan_par_spec.rda")
-tupper <- 365
+## Option 1 ends
+
+# ## Option 2:
+# ## load sythetic data analysis MLE result (result obtained from running MLestimation.R)
+# load("synthetic_MLE_result.rda")
+# ## Option 2 ends
 
 # setup harm measure functions
 harm_measure_fun <- function(t, X, harm_fun, par) {
@@ -393,6 +331,4 @@ harm_curve_rah_age <- do.call(rbind, lapply(1:tupper, function(t) {
       return(result)
 }))
 
-save.image(file = "taiwan_parmix_05192021_harmriskfactor.rda")
-
-# create figures
+save.image(file = "synthetic_harmriskfactor.rda")
