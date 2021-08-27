@@ -9,6 +9,11 @@ require(ggplot2)
 require(scales)
 require(patchwork)
 
+
+# setwd to root, change as appropriate
+setwd("/Users/daisyzhu/Documents/Research Projects/SPADE/manuscript/code_submission/mixture_survival")
+# setwd
+setwd("data_analysis/")
 # MLE
 souce("MLestimation.R") # output MLE estimates using synthetic Taiwan data
 

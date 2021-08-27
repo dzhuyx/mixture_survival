@@ -1,9 +1,5 @@
 rm(list = ls())
 
-# setwd to root
-setwd("/Users/daisyzhu/Documents/Research Projects/SPADE/manuscript/code_submission/mixture_survival")
-# setwd
-setwd("data_analysis/")
 library(rootSolve)
 # real data, LHID-2010
 # load("Before PSM-for Zheyu.RData")
