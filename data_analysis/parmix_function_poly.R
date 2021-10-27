@@ -1,16 +1,9 @@
-# library(numDeriv, lib.loc="/users/yzhu/Rlibs")
-# library(MASS, lib.loc="/users/yzhu/Rlibs")
-# library(rootSolve, lib.loc="/users/yzhu/Rlibs")
-# library(Rcpp, lib.loc="/users/yzhu/Rlibs")
+
 library(numDeriv)
 library(MASS)
 library(rootSolve)
 library(Rcpp)
 sourceCpp("llh_fun.cpp")
-
-# library(numDeriv)
-# library(MASS)
-# library(rootSolve)
 
 expit <- function(x) {
       return(exp(x) / (1 + exp(x)))
